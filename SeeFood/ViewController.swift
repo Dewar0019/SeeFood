@@ -8,6 +8,7 @@
 
 import UIKit
 import SwiftyJSON
+import Alamofire
 
 class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
 
@@ -17,9 +18,12 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
 
   @IBOutlet weak var emotionStatus: UITextField!
   var googleAPIKey = ""
+
   var googleURL: URL {
     return URL(string: "https://vision.googleapis.com/v1/images:annotate?key=\(googleAPIKey)")!
   }
+
+  var nutritionixURL: String = "https://trackapi.nutritionix.com/v2/natural/nutrients"
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -133,8 +137,6 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     self.emotionStatus.text = ""
   }
 
-
-
   func analyzeResults(_ dataToParse: Data) {
 
     // Update UI on the main thread
@@ -190,13 +192,38 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         } else if labelAnnotations != nil && Float(labelAnnotations["score"].floatValue) > 0.65 {
 
           self.emotionStatus.text = "object:\(labelAnnotations["description"]) score:\(labelAnnotations["score"])"
+
+
+
+
         } else {
           self.emotionStatus.text = "No face or object accurately detected"
         }
       }
     })
   }
-  
+
+  func getNutritionInformation(_ food: String) {
+    let parameters: Parameters = ["query": food]
+
+    let headers: HTTPHeaders = [
+      "x-app-id": "",
+      "x-app-key": "",
+      "x-remote-user-id": "0",
+      "Content-Type": "application/json",
+      "Accept": "application/json"
+    ]
+
+    Alamofire.request(nutritionixURL, method: .post, headers: headers, parameters: parameters, encoding: JSONEncoding.default).validate().responseJSON { response in
+      switch response.result {
+      case .success:
+        print("Validation Successful")
+      case .failure(let error):
+        print(error)
+      }
+    }
+  }
+
   override func didReceiveMemoryWarning() {
     super.didReceiveMemoryWarning()
     // Dispose of any resources that can be recreated.

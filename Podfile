@@ -4,10 +4,9 @@
 target 'SeeFood' do
   # Comment the next line if you're not using Swift and don't want to use dynamic frameworks
   use_frameworks!
-  pod 'SwiftyJSON'
-
-
   # Pods for SeeFood
+  pod 'SwiftyJSON'
+  pod 'Alamofire'
 
   target 'SeeFoodTests' do
     inherit! :search_paths
